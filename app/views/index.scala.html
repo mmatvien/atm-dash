@@ -1,0 +1,34 @@
+@(payload: ClientPayload)
+@main("ATM RELEASE") {
+
+
+        <!--Div that will hold the pie chart-->
+    <div id="chart_div" style="width : 400 ; height : 300"></div>
+
+    <script src="@routes.Assets.at("javascripts/stepsChart.js")"></script>
+    <script>
+
+            var stepSummaries = [];
+
+            @for(step <- payload.stepSummaries) {
+
+            stepSummaries.push({
+                step:@step._id,
+                count: @step.stepStarted,
+                completed: @step.stepCompleted,
+                timeMin: @step.timeMin,
+                timeMax: @step.timeMax,
+                stuckCount: @step.stuckCount,
+                restartedCount: @step.restartedCount
+            });
+            }
+
+            window.stepSummaries = stepSummaries;
+
+
+            google.charts.load('current', {'packages': ['bar']});
+
+
+            google.charts.setOnLoadCallback(window.initChart)
+    </script>
+}
