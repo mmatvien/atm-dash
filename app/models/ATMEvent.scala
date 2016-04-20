@@ -177,7 +177,7 @@ class ATMEventRepo @Inject()(tepkinMongoApi: TepkinMongoApi, system: ActorSystem
         val terminalStepFiltered = term.terminalSteps.filter(_.step == stepNumber)
         val terminalStepCount = terminalStepFiltered.length
 
-        val stepCompleted = term.terminalSteps.count(st => st.step == stepNumber + 1 && st.t)
+        val stepCompleted = term.terminalSteps.count(st => st.step == stepNumber + 1 )
 
         if (terminalStepCount > 1) {
           // restarted
