@@ -5,7 +5,7 @@
 
 # Home page
 GET         /                    controllers.Application.index
-#GET         /timeline            controllers.Application.timeline(keyword:String)
+GET         /version            controllers.Application.version(version:String)
 GET         /feed                controllers.Application.feed
 
 

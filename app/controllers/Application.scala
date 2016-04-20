@@ -15,11 +15,17 @@ import scala.concurrent.ExecutionContext
 
 class Application @Inject()(wSClient: WSClient, val atmEventRepo: ATMEventRepo)(implicit ec: ExecutionContext, mat: Materializer) extends Controller with Flow1 {
 
+  def index = Action {
+    //default version
+    val defaultVersion = atmEventRepo.versions.reverse.head
+    Redirect(routes.Application.version(defaultVersion))
+  }
 
-  def index = Action.async {
+
+  def version(version: String)  = Action.async {
     // init the feed
-    val clientPayload = atmEventRepo.initializeClient("1.2")
-    clientPayload.map { s => println(s); Ok(views.html.index(s)) }
+    val clientPayload = atmEventRepo.initializeClient(version)
+    clientPayload.map { s => println(s); Ok(views.html.index(s, version)) }
   }
 
 
@@ -35,7 +41,6 @@ class Application @Inject()(wSClient: WSClient, val atmEventRepo: ATMEventRepo)(
         BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toJson(errors)))
       },
       atmEvent => {
-//        router ! Publish(atmEvent)
         atmEventRepo.insert(List(atmEvent))
         Ok(Json.obj("status" -> "OK", "message" -> ("Place '" + atmEvent.message + "' saved.")))
       }

@@ -26,3 +26,17 @@ hr {
 .navbar-static-top {
   border-bottom: 0;
 }
+
+.donut-inner {
+  margin-top: -67px;
+  margin-bottom: 67px;
+}
+.donut-inner h5 {
+  margin-bottom: 5px;
+  margin-top: 0;
+  text-align: center;
+}
+.donut-inner span {
+  font-size: 12px;
+  text-align: center;
+}

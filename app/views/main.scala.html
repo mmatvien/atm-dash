@@ -12,7 +12,8 @@
 
         <link href="/assets/css/toolkit-inverse.css" rel="stylesheet">
 
-
+        <script src="/assets/js/jquery.min.js"></script>
+        <script src="/assets/js/chart.js"></script>
         <link href="/assets/css/application.css" rel="stylesheet">
 
         <style>
@@ -44,128 +45,12 @@
                             ATM RELEASES
                         </a>
                     </div>
-                    @*<div id="navbar" class="navbar-collapse collapse">*@
-                    @*<ul class="nav navbar-nav">*@
-                    @*<li >*@
-                    @*<a href="../order-history/index.html">Order History</a>*@
-                    @*</li>*@
-                    @*<li class="active">*@
-                    @*<a href="../fluid/index.html">Fluid layout</a>*@
-                    @*</li>*@
-                    @*<li >*@
-                    @*<a href="../icon-nav/index.html">Icon nav</a>*@
-                    @*</li>*@
-                    @*<li >*@
-                    @*<a href="../docs/index.html">*@
-                    @*Docs*@
-                    @*</a>*@
-                    @*</li>*@
-                    @*<li >*@
-                    @*<a href="../light/index.html">Light UI</a>*@
-                    @*</li>*@
-                    @*</ul>*@
-                    @*<form class="form-inline navbar-form navbar-right">*@
-                    @*<div class="input-with-icon">*@
-                    @*<input class="form-control" type="text" placeholder="Search...">*@
-                    @*<span class="icon icon-magnifying-glass"></span>*@
-                    @*</div>*@
-                    @*</form>*@
-                    @*</div>*@
                 </div>
             </nav>
 
             <div class="container-fluid container-fluid-spacious">
-                <div class="dashhead m-t-md">
-                    <div class="dashhead-titles">
-                        <h6 class="dashhead-subtitle">Dashboards</h6>
-                        <h2 class="dashhead-title">VERSION 1.2</h2>
-                    </div>
-
-
-                    <div class="m-x-auto" style="width: 120px;" >
-                        <canvas width="120" height="120"
-                        data-chart="doughnut"
-                        data-value="[{ value: 130, color: '#1ca8dd', label: 'Started' }, { value: 30, color: '#1bc98e', label: 'Finished' }]"
-                        data-segment-stroke-color="#252830">
-                        </canvas>
-                    </div>
-                    @*<div class="dashhead-titles text-xs-center">*@
-                    @*<div id="donut_single" style="width : 250px ; height : 250px ;"></div>*@
-                    @*</div>*@
-
-                    <div class="btn-toolbar dashhead-toolbar">
-                        <div class="btn-toolbar-item input-with-icon">
-
-                            <select class="custom-select custom-select-md" id="versionSelector" >
-
-                                <option value="1.2">1.2</option>
-
-                            </select>
-
-
-                            @*<input type="text" value="01/01/15 - 01/08/15" class="form-control" data-provide="datepicker">*@
-                            @*<span class="icon icon-calendar"></span>*@
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hr-divider m-t m-b-md">
-                    <h3 class="hr-divider-content hr-divider-heading">Quick stats</h3>
-                </div>
-                <div class="row statcards">
-                    <div class="col-sm-6 col-md-3 m-b">
-                        <div class="statcard">
-                            <div class="p-a">
-                                <span class="statcard-desc">Started</span>
-                                <h2 class="statcard-number">
-                                    12,938
-                                    @*<small class="label label-success">5%</small>*@
-                                </h2>
-                            </div>
-                            @*<canvas id="sparkline1" width="378" height="94" class="sparkline" data-chart="spark-line" data-value="[{strokeColor: '#1ca8dd', fillColor:'rgba(28,168,221,.03)', data:[28,68,41,43,96,45,100]}]" data-labels="['a', 'b','c','d','e','f','g']" style="width : 189px ; height : 47px ;"></canvas>*@
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-3 m-b">
-                        <div class="statcard">
-                            <div class="p-a">
-                                <span class="statcard-desc">Stalled</span>
-                                <h2 class="statcard-number">
-                                    758
-                                    <small class="label label-danger">1.3%</small>
-                                </h2>
-                            </div>
-                            @*<canvas id="sparkline1" width="378" height="94" class="sparkline" data-chart="spark-line" data-value="[{strokeColor: '#1ca8dd', fillColor:'rgba(28,168,221,.03)', data:[4,34,64,27,96,50,80]}]" data-labels="['a', 'b','c','d','e','f','g']" style="width : 189px ; height : 47px ;"></canvas>*@
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-3 m-b">
-                        <div class="statcard">
-                            <div class="p-a">
-                                <span class="statcard-desc">Restarted</span>
-                                <h2 class="statcard-number">
-                                    1,293
-                                    <small class="label label-success">6.75%</small>
-                                </h2>
-                            </div>
-                            @*<canvas id="sparkline1" width="378" height="94" class="sparkline" data-chart="spark-line" data-value="[{strokeColor: '#1ca8dd', fillColor:'rgba(28,168,221,.03)', data:[12,38,32,60,36,54,68]}]" data-labels="['a', 'b','c','d','e','f','g']" style="width : 189px ; height : 47px ;"></canvas>*@
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-3 m-b">
-                        <div class="statcard">
-                            <div class="p-a">
-                                <span class="statcard-desc">Finished</span>
-                                <h2 class="statcard-number">
-                                    758
-                                    <small class="label label-success">1.3%</small>
-                                </h2>
-                            </div>
-                            @*<canvas id="sparkline1" width="378" height="94" class="sparkline" data-chart="spark-line" data-value="[{strokeColor: '#1ca8dd', fillColor:'rgba(28,168,221,.03)', data:[43,48,52,58,50,95,100]}]" data-labels="['a', 'b','c','d','e','f','g']" style="width : 189px ; height : 47px ;"></canvas>*@
-                        </div>
-                    </div>
-                </div>
-
 
                 @content
-
 
                 <div class="hr-divider m-t-lg m-b-md">
                     <h3 class="hr-divider-content hr-divider-heading">Step 1</h3>
@@ -283,14 +168,14 @@
                             </a>
 
                         </div>
-                        <a href="#" class="btn btn-primary-outline">View all devices</a>
+                        <a href="#" class="btn btn-primary-outline">View all</a>
                     </div>
                 </div>
 
             </div>
 
-            <script src="/assets/js/jquery.min.js"></script>
-            <script src="/assets/js/chart.js"></script>
+
+
             <script src="/assets/js/tablesorter.min.js"></script>
             <script src="/assets/js/toolkit.js"></script>
             <script src="/assets/js/application.js"></script>

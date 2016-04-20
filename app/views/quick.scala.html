@@ -1,0 +1,55 @@
+@(payload: ClientPayload)
+
+
+<div class="hr-divider m-t m-b-md">
+    <h3 class="hr-divider-content hr-divider-heading">Quick stats</h3>
+</div>
+<div class="row statcards">
+    <div class="col-sm-6 col-md-3 m-b">
+        <div class="statcard">
+            <div class="p-a">
+                <span class="statcard-desc">Started</span>
+                <h2 class="statcard-number" >
+                    <span id = "QuickStatsStarted">@payload.quickStats.started</span>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3 m-b">
+        <div class="statcard">
+            <div class="p-a">
+                <span class="statcard-desc">Stalled</span>
+                <h2 class="statcard-number">
+                    <span id = "QuickStatsStalled"> @payload.quickStats.stalled </span>
+                    <small class="label label-danger" id = "QuickStatsStalledPerc"> @((payload.quickStats.started.toDouble / 100 * payload.quickStats.stalled))
+                        %</small>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3 m-b">
+        <div class="statcard">
+            <div class="p-a">
+                <span class="statcard-desc">Restarted</span>
+                <h2 class="statcard-number" >
+                    <span id = "QuickStatsRestarted"> @payload.quickStats.restarted </span>
+
+                    <small class="label label-warning" id = "QuickStatsRestartedPerc">@(payload.quickStats.started.toDouble / 100 * payload.quickStats.restarted)
+                        %</small>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3 m-b">
+        <div class="statcard">
+            <div class="p-a">
+                <span class="statcard-desc">Finished</span>
+                <h2 class="statcard-number">
+                    <span id = "QuickStatsFinished"> @payload.quickStats.finished </span>
+                    <small class="label label-success" id = "QuickStatsFinishedPerc">@(payload.quickStats.started.toDouble / 100 * payload.quickStats.finished)
+                        %</small>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>

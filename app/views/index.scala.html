@@ -1,14 +1,18 @@
-@(payload: ClientPayload)
+@(payload: ClientPayload, versionStr: String)
+
 @main("ATM RELEASE") {
 
+    @version(payload, versionStr)
+    @quick(payload)
 
-        <!--Div that will hold the pie chart-->
+    <!--Div that will hold the pie chart-->
     <div id="chart_div" style="width : 400 ; height : 300"></div>
 
     <script src="@routes.Assets.at("javascripts/stepsChart.js")"></script>
     <script>
 
             var stepSummaries = [];
+            var progress = [];
 
             @for(step <- payload.stepSummaries) {
 
@@ -23,12 +27,28 @@
             });
             }
 
+            progress.push({
+                value: @payload.quickStats.finished,
+                color: '#1bc98e',
+                label: 'Finished'
+            }, {
+                value: @payload.quickStats.started,
+                color: '#1ca8dd',
+                label: 'Started'
+            })
+
+            window.progressData = progress;
             window.stepSummaries = stepSummaries;
 
 
             google.charts.load('current', {'packages': ['bar']});
 
 
-            google.charts.setOnLoadCallback(window.initChart)
+            google.charts.setOnLoadCallback(window.initChart);
+
+            $("#versionSelector").change(function () {
+                window.location.replace("version?version=" + $(this).val());
+            });
+
     </script>
 }

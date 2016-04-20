@@ -36,7 +36,6 @@ object StepSummary {
       ("restartedCount" := steps.restartedCount)
 }
 
-
 case class TerminalStep(step: Int, ts: Long)
 object TerminalStep {
   implicit val termminalStepFormat = Json.format[TerminalStep]
@@ -53,7 +52,12 @@ object Terminal {
   }
 }
 
-case class ClientPayload(stepSummaries: List[StepSummary])
+case class QuickStats(started: Int, stalled: Int, restarted: Int, finished: Int)
+object QuickStats {
+  implicit val statsFormat = Json.format[QuickStats]
+}
+
+case class ClientPayload(stepSummaries: List[StepSummary], quickStats: QuickStats, versions: List[String])
 
 case object ClientPayload {
   implicit val payloadFormat = Json.format[ClientPayload]

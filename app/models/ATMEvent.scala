@@ -101,6 +101,14 @@ class ATMEventRepo @Inject()(tepkinMongoApi: TepkinMongoApi, system: ActorSystem
   }
 
 
+  def generateQuickStats(st: List[StepSummary]): QuickStats = {
+    val started = st.find(_._id == 1).getOrElse(StepSummary(1, 0, 0, 0, 0, 0, 0)).stepStarted
+    val stalled = st.foldLeft(0)((acc, st) => acc + st.stuckCount)
+    val restarted = st.foldLeft(0)((acc, st) => acc + st.restartedCount)
+    val finished = st.count(_._id == 142)
+    QuickStats(started, stalled, restarted, finished)
+  }
+
   def tailCollection(version: String): Unit = {
 
     println(s"tailed collections = $tailedCollections")
@@ -108,6 +116,8 @@ class ATMEventRepo @Inject()(tepkinMongoApi: TepkinMongoApi, system: ActorSystem
       println(s"collection $version is already tailed")
     else {
       println(s"creating collection events_$version")
+      if (!versions.contains(version))
+        versions = version :: versions
       tailedCollections = version :: tailedCollections
       db.createCollection(s"events_$version", capped = Some(true), size = Some(100000000))
 
@@ -117,18 +127,16 @@ class ATMEventRepo @Inject()(tepkinMongoApi: TepkinMongoApi, system: ActorSystem
         .runForeach {
           event => event.map(ATMEvent(_)).collect {
             case JsSuccess(p, _) =>
-println("--")
               if (clientConnected) {
                 val payload = constructPayload(version)
                 payload.map { st =>
-                  println(st)
-                  router ! Publish(ClientPayload(st))
+                  val quickStats = generateQuickStats(st)
+                  router ! Publish(ClientPayload(st, quickStats, versions))
                 }
               }
           }
         }
     }
-
   }
 
   def constructPayload(version: String): Future[List[StepSummary]] = {
@@ -145,27 +153,41 @@ println("--")
       } yield {
         val stepCompletionT = stepCompletionTimes(step.step, terms)
         val minMax = stepCompletionT.foldLeft((0, 0))((acc, t) => (acc._1 min t._3, acc._2 max t._3))
+        val (started, restarted, completed) = calculateStepStarted(step.step, terms)
 
         StepSummary(
           step.step,
-          calculateStepStarted(step.step, terms),
-          calculateStepCompleted(step.step, terms),
+          started,
+          completed,
           minMax._1,
           minMax._2,
           calculateStuckCount(step.step, terms),
-          calculateRestartedCount(step.step, terms)
+          restarted
         )
       }
     }.distinct
   }
 
-  def calculateStepStarted(step: Int, terms: List[Terminal]) = {
-    terms.foldLeft(0)((acc, term) => acc + term.terminalSteps.count(_.step == step))
+
+  def calculateStepStarted(stepNumber: Int, terms: List[Terminal]): (Int, Int, Int) = {
+    // count started once and accumulate the restarts if same step was started more then once
+
+    terms.foldLeft((0, 0, 0)) {
+      (acc, term) =>
+        val terminalStepFiltered = term.terminalSteps.filter(_.step == stepNumber)
+        val terminalStepCount = terminalStepFiltered.length
+
+        val stepCompleted = term.terminalSteps.count(st => st.step == stepNumber + 1 && st.t)
+
+        if (terminalStepCount > 1) {
+          // restarted
+          (acc._1 + 1, acc._2 + (terminalStepCount - 1), acc._3 + (stepCompleted - (terminalStepCount - 1)))
+        } else {
+          (acc._1 + terminalStepCount, acc._2, acc._3 + stepCompleted)
+        }
+    }
   }
 
-  def calculateStepCompleted(step: Int, terms: List[Terminal]) = {
-    terms.foldLeft(0)((acc, term) => acc + term.terminalSteps.count(_.step == step + 1))
-  }
 
   def stepCompletionTimes(step: Int, terms: List[Terminal]): List[(String, Int, Int)] = {
     terms.map { term =>
@@ -174,11 +196,14 @@ println("--")
       val lastTs = stepStartedList.reverse.head.ts
 
       val stepEndedList = term.terminalSteps.filter(_.step == step + 1)
-      val timePassed = if (stepEndedList.isEmpty) {
-        (new Date().getTime / 1000) - lastTs
-      } else {
-        stepEndedList.head.ts - lastTs
-      }
+
+      val timePassed =
+        if (stepEndedList.isEmpty) {
+          // still working ...
+          (new Date().getTime / 1000) - lastTs
+        } else {
+          stepEndedList.head.ts - lastTs
+        }
       (term._id, step, timePassed.toInt)
     }
   }
@@ -186,38 +211,14 @@ println("--")
   def calculateStuckCount(step: Int, terms: List[Terminal]) = {
     1
   }
-  def calculateRestartedCount(step: Int, terms: List[Terminal]) = {
-    terms.count { term =>
-      term.terminalSteps.count(_.step == step) > 1
-    }
-  }
+
 
   def initializeClient(version: String) = {
     println(" --------------------- CLIENT INITIALIZED ---------")
     clientConnected = true
-    constructPayload(version).map(ClientPayload(_))
+    constructPayload(version).map(st => ClientPayload(st, generateQuickStats(st), versions))
   }
 
-
-  //  def groupSteps(version: String): Future[List[StepCount]] = {
-  //    val collection = db(s"events_$version")
-  //
-  //    val pipeline: List[BsonDocument] = List(
-  //      "$match" := BsonDocument.empty,
-  //      "$group" := ("_id" := "$step") ~ ("stepCount" := ("$sum" := 1)),
-  //      "$sort" := ("total" := -1)
-  //    )
-  //
-  //    val res = collection.aggregate(pipeline).runFold(List.empty[BsonDocument])(_ ++ _)
-  //
-  //    res.map { re =>
-  //      re.map { z => println(z); Step(z) }.collect {
-  //        case JsSuccess(p, _) =>
-  //          println(p)
-  //          p
-  //      }
-  //    }
-  //  }
 
   def groupTerminals(version: String) = {
     val collection = db(s"events_$version")
@@ -233,7 +234,7 @@ println("--")
     val res = collection.aggregate(pipeline).runFold(List.empty[BsonDocument])(_ ++ _)
 
     res.map { re =>
-      re.map{x => println(x);Terminal(x)}.collect {
+      re.map {Terminal(_)}.collect {
         case JsSuccess(p, _) => p
       }
     }
@@ -249,7 +250,7 @@ println("--")
     if (!tailedCollections.contains(version)) {
       tailCollection(version)
       db(s"events_$version").insert(ps.map(event => ATMEvent.toBsonDocument(event.copy(ts = epoch))))
-    } else  {
+    } else {
       db(s"events_$version").insert(ps.map(event => ATMEvent.toBsonDocument(event.copy(ts = epoch))))
     }
   }

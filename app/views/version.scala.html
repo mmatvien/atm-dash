@@ -1,0 +1,27 @@
+@(payload: ClientPayload, versionStr: String)
+<div class="dashhead m-t-md">
+    <div class="dashhead-titles">
+        <h6 class="dashhead-subtitle">Dashboards</h6>
+        <h2 class="dashhead-title">VERSION
+        <select class="custom-select custom-select-lg" id="versionSelector" >
+        @for(v <- payload.versions) {
+            @if(v == versionStr) {
+                <option value="@v" selected>@v</option>
+            } else {
+                <option value="@v">@v</option>
+            }
+
+        }
+        </select>
+        </h2>
+    </div>
+
+
+    <div class="m-x-auto" style="width : 120px ;" >
+        <canvas width="120" height="120" id="progressChart"> </canvas>
+        <div class="donut-inner">
+            <h5 id="progressPercent">100%</h5>
+        </div>
+    </div>
+
+</div>
