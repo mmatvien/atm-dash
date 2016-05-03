@@ -7,7 +7,7 @@
 
     <!--Div that will hold the pie chart-->
     <div id="chart_div" style="width : 400 ; height : 300"></div>
-
+    @detail(payload)
     <script src="@routes.Assets.at("javascripts/stepsChart.js")"></script>
     <script>
 
@@ -18,12 +18,12 @@
 
             stepSummaries.push({
                 step:@step._id,
-                count: @step.stepStarted,
-                completed: @step.stepCompleted,
+                stepStarted: @step.stepStarted,
+                stepRestarted: @step.stepRestarted,
+                stepCompleted: @step.stepCompleted,
+                stepStalled: @step.stepStalled,
                 timeMin: @step.timeMin,
-                timeMax: @step.timeMax,
-                stuckCount: @step.stuckCount,
-                restartedCount: @step.restartedCount
+                timeMax: @step.timeMax
             });
             }
 
@@ -35,7 +35,7 @@
                 value: @payload.quickStats.started,
                 color: '#1ca8dd',
                 label: 'Started'
-            })
+            });
 
             window.progressData = progress;
             window.stepSummaries = stepSummaries;

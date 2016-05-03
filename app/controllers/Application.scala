@@ -17,12 +17,17 @@ class Application @Inject()(wSClient: WSClient, val atmEventRepo: ATMEventRepo)(
 
   def index = Action {
     //default version
-    val defaultVersion = atmEventRepo.versions.reverse.head
-    Redirect(routes.Application.version(defaultVersion))
+    atmEventRepo.initialize {}
+    if (atmEventRepo.versions.isEmpty) {
+      Ok("No available versions found... ")
+    } else {
+      val defaultVersion = atmEventRepo.versions.reverse.head
+      Redirect(routes.Application.version(defaultVersion))
+    }
   }
 
 
-  def version(version: String)  = Action.async {
+  def version(version: String) = Action.async {
     // init the feed
     val clientPayload = atmEventRepo.initializeClient(version)
     clientPayload.map { s => println(s); Ok(views.html.index(s, version)) }
@@ -30,7 +35,7 @@ class Application @Inject()(wSClient: WSClient, val atmEventRepo: ATMEventRepo)(
 
 
   def feed = Action {
-    Ok.chunked(atmEventRepo.source.map { p => println(s"to client: $p"); Json.toJson[ClientPayload](p) } via EventSource.flow)
+    Ok.chunked(atmEventRepo.source.map(Json.toJson[ClientPayload](_)) via EventSource.flow)
   }
 
 

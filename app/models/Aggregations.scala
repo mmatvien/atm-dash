@@ -11,13 +11,15 @@ import play.api.libs.json.{JsResult, Json}
   * Time: 11:59 AM
   */
 
-case class StepSummary(_id: Int,
-                 stepStarted: Int,
-                 stepCompleted: Int,
-                 timeMin: Int,
-                 timeMax: Int,
-                 stuckCount: Int,
-                 restartedCount: Int)
+case class StepSummary(
+                        _id: Int,
+                        stepStarted: Int,
+                        stepRestarted: Int,
+                        stepCompleted: Int,
+                        stepStalled: Int,
+                        timeMin: Int,
+                        timeMax: Int
+                      )
 
 object StepSummary {
   implicit val stepsFormat = Json.format[StepSummary]
@@ -29,14 +31,15 @@ object StepSummary {
   def toBsonDocument(steps: StepSummary): BsonDocument =
     ("_id" := steps._id) ~
       ("stepStarted" := steps.stepStarted) ~
+      ("stepRestarted" := steps.stepStarted) ~
       ("stepCompleted" := steps.stepCompleted) ~
+      ("stepStalled" := steps.stepStalled) ~
       ("timeMin" := steps.timeMin) ~
-      ("timeMax" := steps.timeMax) ~
-      ("stuckCount" := steps.stuckCount) ~
-      ("restartedCount" := steps.restartedCount)
+      ("timeMax" := steps.timeMax)
 }
 
 case class TerminalStep(step: Int, ts: Long)
+
 object TerminalStep {
   implicit val termminalStepFormat = Json.format[TerminalStep]
   def apply(bson: BsonDocument): JsResult[TerminalStep] = {
@@ -45,6 +48,7 @@ object TerminalStep {
 }
 
 case class Terminal(_id: String, terminalSteps: List[TerminalStep])
+
 object Terminal {
   implicit val terminalFormat = Json.format[Terminal]
   def apply(bson: BsonDocument): JsResult[Terminal] = {
@@ -53,6 +57,7 @@ object Terminal {
 }
 
 case class QuickStats(started: Int, stalled: Int, restarted: Int, finished: Int)
+
 object QuickStats {
   implicit val statsFormat = Json.format[QuickStats]
 }
